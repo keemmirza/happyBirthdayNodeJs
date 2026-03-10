@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Happy Birthday <%= name %>!</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    <style>
+        body { background: #0f0f0f; color: #ffeb3b; display: flex; flex-direction: column; 
+               justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: 'Arial', sans-serif; text-align: center; }
+        h1 { font-size: 4rem; text-shadow: 0 0 20px #ff9800; margin-bottom: 10px; }
+        .name-tag { font-size: 5rem; color: #ff4081; display: block; }
+        button { padding: 15px 30px; font-size: 1.2rem; background: #e91e63; color: white; border: none; border-radius: 50px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Happy Birthday,</h1>
+    <span class="name-tag"><%= name %>! 🎂</span>
+    <br>
+    <button id="startBtn" onclick="celebrate()">Press for the Surprise!</button>
+
+    <audio id="bdaySong" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+
+    <script>
+        function celebrate() {
+            // 1. Play Song (Browsers require a click to play audio)
+            const song = document.getElementById('bdaySong');
+            song.play();
+
+            // 2. Hide Button
+            document.getElementById('startBtn').style.display = 'none';
+
+            // 3. Fireworks Animation
+            const duration = 10 * 1000;
+            const animationEnd = Date.now() + duration;
+
+            (function frame() {
+                const timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) return;
+
+                confetti({
+                    particleCount: 3,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#ff0000', '#00ff00', '#0000ff']
+                });
+                confetti({
+                    particleCount: 3,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#ffeb3b', '#e91e63', '#00ff88']
+                });
+
+                requestAnimationFrame(frame);
+            }());
+        }
+    </script>
+</body>
+</html>
