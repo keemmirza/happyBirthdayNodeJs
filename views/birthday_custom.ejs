@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Happy Birthday!</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    <style>
+        body { background: #0f0f0f; color: white; display: flex; flex-direction: column; 
+               justify-content: center; align-items: center; height: 100vh; margin: 0; 
+               font-family: 'Georgia', serif; text-align: center; }
+        h1 { font-size: 3.5rem; text-shadow: 0 0 20px #ff9800; margin-bottom: 5px; }
+        .name { color: #ffeb3b; font-weight: bold; }
+        .love-msg { font-size: 4.5rem; color: #ff4081; text-shadow: 0 0 20px #e91e63; }
+        button { padding: 15px 30px; font-size: 1.2rem; background: #e91e63; color: white; 
+                 border: none; border-radius: 50px; cursor: pointer; transition: 0.3s; margin-top: 30px;}
+        button:hover { background: #ff4081; transform: translateY(-3px); }
+    </style>
+</head>
+<body>
+    
+    <% if (showLove) { %>
+        <h1>Happy Birthday to you,</h1>
+        <span class="love-msg">I Love You, <%= name %>! ❤️</span>
+    <% } else { %>
+        <h1>Happy Birthday,</h1>
+        <span class="love-msg"><%= name %>! 🎂</span>
+    <% } %>
+
+    <br>
+    <button id="startBtn" onclick="celebrate()">Click for Surprise!</button>
+
+    <script>
+        function celebrate() {
+            document.getElementById('startBtn').style.display = 'none';
+
+            // Customized "Heartbeat" Confetti Logic
+            const duration = 15 * 1000;
+            const animationEnd = Date.now() + duration;
+
+            (function frame() {
+                const timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) return;
+
+                const particleCount = 5;
+                // Romantic colors: Reds and Pinks
+                const colors = ['#e91e63', '#ff4081', '#ff1744', '#ffffff']; 
+
+                confetti({
+                    particleCount,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: colors
+                });
+                confetti({
+                    particleCount,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: colors
+                });
+
+                requestAnimationFrame(frame);
+            }());
+        }
+    </script>
+</body>
+</html>
