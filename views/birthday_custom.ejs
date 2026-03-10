@@ -1,65 +1,115 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Happy Birthday!</title>
+    <title>A Special Surprise!</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <style>
-        body { background: #0f0f0f; color: white; display: flex; flex-direction: column; 
-               justify-content: center; align-items: center; height: 100vh; margin: 0; 
-               font-family: 'Georgia', serif; text-align: center; }
-        h1 { font-size: 3.5rem; text-shadow: 0 0 20px #ff9800; margin-bottom: 5px; }
-        .name { color: #ffeb3b; font-weight: bold; }
-        .love-msg { font-size: 4.5rem; color: #ff4081; text-shadow: 0 0 20px #e91e63; }
-        button { padding: 15px 30px; font-size: 1.2rem; background: #e91e63; color: white; 
-                 border: none; border-radius: 50px; cursor: pointer; transition: 0.3s; margin-top: 30px;}
-        button:hover { background: #ff4081; transform: translateY(-3px); }
+        :root { --box-color: #ff4081; --lid-color: #e91e63; --ribbon-color: #ffeb3b; }
+        body { background: #0f0f0f; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: 'Georgia', serif; overflow: hidden; }
+
+        /* The Gift Box Container */
+        .gift-container { position: relative; cursor: pointer; transition: transform 0.3s; }
+        .gift-container:hover { transform: scale(1.05); }
+
+        /* The Shaking Animation */
+        .shake { animation: shake 0.5s infinite; }
+        @keyframes shake {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(5deg); }
+            50% { transform: rotate(0eg); }
+            75% { transform: rotate(-5deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        /* Box Parts */
+        .box-body { width: 150px; height: 120px; background: var(--box-color); position: relative; border-radius: 0 0 5px 5px; }
+        .box-lid { width: 160px; height: 40px; background: var(--lid-color); position: absolute; top: -40px; left: -5px; border-radius: 5px; transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 2; }
+        .ribbon { position: absolute; background: var(--ribbon-color); box-shadow: 0 0 10px rgba(0,0,0,0.2); }
+        .ribbon-vert { width: 30px; height: 100%; left: 60px; }
+        .ribbon-horiz { width: 100%; height: 20px; top: 10px; }
+
+        /* The Message (Hidden inside) */
+        .message {
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            width: 300px; color: white; opacity: 0; pointer-events: none;
+            transition: all 1s ease-out; font-size: 1.5rem; line-height: 1.2;
+        }
+        .message.reveal { opacity: 1; transform: translate(-50%, -200px); }
+        .love-text { font-size: 3rem; color: #ff4081; display: block; margin-top: 10px; text-shadow: 0 0 15px #ff4081; }
+
+        /* Action: Open Lid */
+        .opened .box-lid { transform: translateY(-120px) rotate(-15deg); opacity: 0; }
+        .opened .gift-container { animation: none; cursor: default; }
+        
+        .hint { color: #888; margin-top: 20px; font-style: italic; }
     </style>
 </head>
 <body>
-    
-    <% if (showLove) { %>
-        <h1>Happy Birthday to you,</h1>
-        <span class="love-msg">I Love You, <%= name %>! ❤️</span>
-    <% } else { %>
-        <h1>Happy Birthday,</h1>
-        <span class="love-msg"><%= name %>! 🎂</span>
-    <% } %>
 
-    <br>
-    <button id="startBtn" onclick="celebrate()">Click for Surprise!</button>
+    <div id="giftWrapper" class="gift-container shake" onclick="openGift()">
+        <div class="box-lid">
+            <div class="ribbon ribbon-horiz"></div>
+        </div>
+        <div class="box-body">
+            <div class="ribbon ribbon-vert"></div>
+        </div>
+        
+        <div id="msg" class="message">
+            <% if (showLove) { %>
+                Happy Birthday! 🎂
+                <span class="love-text">I LOVE YOU, <%= name %>! ❤️</span>
+            <% } else { %>
+                <span class="love-text">HAPPY BIRTHDAY, <%= name %>! 🎂</span>
+            <% } %>
+        </div>
+    </div>
+
+    <p id="hintText" class="hint">Tap the gift to open your surprise...</p>
+
+    <audio id="bdayMusic" preload="auto" loop>
+        <source src="/music-box-birthday.mp3" type="audio/mpeg">
+    </audio>
 
     <script>
-        function celebrate() {
-            document.getElementById('startBtn').style.display = 'none';
+        function openGift() {
+            const wrapper = document.getElementById('giftWrapper');
+            const msg = document.getElementById('msg');
+            const music = document.getElementById('bdayMusic');
+            const hint = document.getElementById('hintText');
 
-            // Customized "Heartbeat" Confetti Logic
-            const duration = 15 * 1000;
-            const animationEnd = Date.now() + duration;
+            if (wrapper.classList.contains('opened')) return;
+
+            // 1. Play Music
+            music.play();
+
+            // 2. Trigger Visual Open
+            wrapper.classList.remove('shake');
+            wrapper.classList.add('opened');
+            msg.classList.add('reveal');
+            hint.style.opacity = '0';
+
+            // 3. Explosive Confetti
+            const end = Date.now() + (10 * 1000);
 
             (function frame() {
-                const timeLeft = animationEnd - Date.now();
-                if (timeLeft <= 0) return;
-
-                const particleCount = 5;
-                // Romantic colors: Reds and Pinks
-                const colors = ['#e91e63', '#ff4081', '#ff1744', '#ffffff']; 
-
                 confetti({
-                    particleCount,
+                    particleCount: 7,
                     angle: 60,
                     spread: 55,
-                    origin: { x: 0 },
-                    colors: colors
+                    origin: { x: 0, y: 0.6 },
+                    colors: ['#ff4081', '#ffeb3b', '#ffffff']
                 });
                 confetti({
-                    particleCount,
+                    particleCount: 7,
                     angle: 120,
                     spread: 55,
-                    origin: { x: 1 },
-                    colors: colors
+                    origin: { x: 1, y: 0.6 },
+                    colors: ['#ff4081', '#ffeb3b', '#ffffff']
                 });
 
-                requestAnimationFrame(frame);
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
             }());
         }
     </script>
